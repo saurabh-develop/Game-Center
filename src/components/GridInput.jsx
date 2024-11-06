@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const GridInput = () => {
-  return (
-    <div>GridInput</div>
-  )
-}
+  return <div>GridInput</div>;
+};
 
-export default GridInput
+export default GridInput;

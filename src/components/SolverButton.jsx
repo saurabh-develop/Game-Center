@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const SolverButton = () => {
-  return (
-    <div>SolverButton</div>
-  )
-}
+  return <div>SolverButton</div>;
+};
 
-export default SolverButton
+export default SolverButton;
