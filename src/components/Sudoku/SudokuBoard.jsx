@@ -37,13 +37,9 @@ const SudokuBoard = ({ goToTicTacToe }) => {
 
   // Handle input changes in Sudoku grid
   const handleChange = (row, col, value) => {
-    if (value === "" || /^[1-9]$/.test(value)) {
-      const parsedValue = value === "" ? "" : parseInt(value);
-      const newBoard = board.map((r, rowIndex) =>
-        r.map((cell, colIndex) =>
-          rowIndex === row && colIndex === col ? parsedValue : cell
-        )
-      );
+    if (value === "" || (value >= "1" && value <= "9")) {
+      const newBoard = [...board];
+      newBoard[row][col] = value === "" ? "" : parseInt(value);
       setBoard(newBoard);
       updateConflicts(newBoard);
     }
@@ -62,7 +58,14 @@ const SudokuBoard = ({ goToTicTacToe }) => {
 
   // Check if the solution is correct
   const checkSolution = () => {
-    const isComplete = board.every((row) => row.every((cell) => cell !== ""));
+    const isComplete = true;
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        if (board[row][col] === "") {
+          isComplete = false;
+        }
+      }
+    }
     const hasConflict = conflicts.some((row) => row.includes(true));
     if (!isComplete) {
       alert("The board is not complete.");
