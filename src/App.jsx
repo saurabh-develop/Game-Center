@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SudokuBoard from "./components/Sudoku/SudokuBoard.jsx";
 import Game from "./components/tickTackToe/Game.jsx";
+import "./App.css";
 
 function App() {
   const [gameSelected, setGameSelected] = useState(null);
@@ -14,6 +15,7 @@ function App() {
       {!gameSelected ? (
         <div className="game-selection">
           <h1>Choose a Game</h1>
+
           <button onClick={() => handleGameSelection("sudoku")}>
             Play Sudoku
           </button>

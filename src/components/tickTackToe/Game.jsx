@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Board from "./Board";
 
 function Game({ goToSudoku }) {
@@ -6,9 +6,18 @@ function Game({ goToSudoku }) {
   const [isXNext, setIsXNext] = useState(true);
 
   const winner = calculateWinner(squares);
-  const status = winner
+  let status = winner
     ? `Winner: ${winner}`
     : `Next player: ${isXNext ? "X" : "O"}`;
+  let isCompleted = true;
+  for (let i = 0; i < 9; i++) {
+    if (squares[i] == null) {
+      isCompleted = false;
+    }
+  }
+  if (isCompleted && !winner) {
+    status = "Match Tied";
+  }
 
   const handleClick = (i) => {
     if (squares[i] || winner) return;
