@@ -1,5 +1,6 @@
 import { INIT_GAME, MOVE } from "./message.js";
 import { Game } from "./Game.js";
+import { WebSocket } from "ws";
 
 export class GameManager {
   constructor() {
