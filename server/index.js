@@ -12,6 +12,4 @@ wss.on("connection", function connection(ws) {
     console.log("Player disconnected");
     gameManager.removeUser(ws);
   });
-
-  ws.send("Welcome to the game!");
 });
