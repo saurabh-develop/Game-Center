@@ -3,14 +3,17 @@ import { generateSudoku, fillBoard } from "./SudokuGenerator";
 import "./SudokuBoard.css";
 import Menu from "../Menu";
 
-const SudokuBoard = ({ goToTicTacToe }) => {
+const SudokuBoard = () => {
   const [difficulty, setDifficulty] = useState("easy");
-  const [board, setBoard] = useState(generateSudoku(difficulty));
+  const initialBoard = generateSudoku(difficulty);
+  const [board, setBoard] = useState(initialBoard);
+  const [fixedCells, setFixedCells] = useState(
+    initialBoard.map((row) => row.map((cell) => cell !== ""))
+  );
   const [conflicts, setConflicts] = useState(
     Array.from({ length: 9 }, () => Array(9).fill(false))
   );
 
-  // Function to check if the move is valid
   const isValidMove = (row, col, value) => {
     for (let i = 0; i < 9; i++) {
       if (
@@ -36,17 +39,15 @@ const SudokuBoard = ({ goToTicTacToe }) => {
     return true;
   };
 
-  // Handle input changes in Sudoku grid
   const handleChange = (row, col, value) => {
     if (value === "" || (value >= "1" && value <= "9")) {
-      const newBoard = [...board];
+      const newBoard = board.map((r) => [...r]);
       newBoard[row][col] = value === "" ? "" : parseInt(value);
       setBoard(newBoard);
       updateConflicts(newBoard);
     }
   };
 
-  // Update conflicts based on new board state
   const updateConflicts = (newBoard) => {
     const newConflicts = newBoard.map((row, rowIndex) =>
       row.map((cell, colIndex) => {
@@ -57,7 +58,6 @@ const SudokuBoard = ({ goToTicTacToe }) => {
     setConflicts(newConflicts);
   };
 
-  // Check if the solution is correct
   const checkSolution = () => {
     let isComplete = true;
     for (let row = 0; row < 9; row++) {
@@ -77,45 +77,53 @@ const SudokuBoard = ({ goToTicTacToe }) => {
     }
   };
 
-  // Generate a new Sudoku puzzle
   const generateNewPuzzle = () => {
     const newBoard = generateSudoku(difficulty);
     setBoard(newBoard);
+    setFixedCells(newBoard.map((row) => row.map((cell) => cell !== "")));
     setConflicts(Array.from({ length: 9 }, () => Array(9).fill(false)));
   };
 
-  // Change the difficulty of the puzzle
   const handleDifficultyChange = (newDifficulty) => {
     setDifficulty(newDifficulty);
-    generateNewPuzzle();
+    const newBoard = generateSudoku(newDifficulty);
+    setBoard(newBoard);
+    setFixedCells(newBoard.map((row) => row.map((cell) => cell !== "")));
+    setConflicts(Array.from({ length: 9 }, () => Array(9).fill(false)));
   };
 
-  // Solve the Sudoku board automatically
   const solveBoard = () => {
     const solvedBoard = board.map((row) => [...row]);
     if (fillBoard(solvedBoard)) {
       setBoard(solvedBoard);
+      setFixedCells(solvedBoard.map((row) => row.map(() => true)));
     } else {
       alert("The board cannot be solved.");
     }
   };
 
-  // Provide a hint for solving the Sudoku
   const giveHint = () => {
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < 9; col++) {
         if (board[row][col] === "") {
           const solvedBoard = board.map((r) => [...r]);
-          fillBoard(solvedBoard);
-          setBoard((prevBoard) =>
-            prevBoard.map((r, rowIndex) =>
-              r.map((cell, colIndex) =>
-                rowIndex === row && colIndex === col
-                  ? solvedBoard[row][col]
-                  : cell
+          if (fillBoard(solvedBoard)) {
+            setBoard((prevBoard) =>
+              prevBoard.map((r, rowIndex) =>
+                r.map((cell, colIndex) =>
+                  rowIndex === row && colIndex === col
+                    ? solvedBoard[row][col]
+                    : cell
+                )
               )
-            )
-          );
+            );
+            const newFixed = fixedCells.map((r, rowIndex) =>
+              r.map((cell, colIndex) =>
+                rowIndex === row && colIndex === col ? true : cell
+              )
+            );
+            setFixedCells(newFixed);
+          }
           return;
         }
       }
@@ -173,7 +181,7 @@ const SudokuBoard = ({ goToTicTacToe }) => {
                       ? "border-r-2"
                       : ""
                   }`}
-                  readOnly={cell !== ""}
+                  readOnly={fixedCells[rowIndex][colIndex]}
                 />
               ))}
             </div>
