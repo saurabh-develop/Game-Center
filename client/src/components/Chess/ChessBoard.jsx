@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { MOVE } from "./ChessGame";
+import { CHESS_MOVE } from "./ChessGame";
 
-const ChessBoard = ({ chess, board, socket, setBoard }) => {
+const ChessBoard = ({ chess, board, socket, setBoard, color }) => {
   const [from, setFrom] = useState(null);
-  const handleDragStart = (e, squareRepresentation) => {
+  if (!color || !board) return null;
+  const handleDragStart = (e, squareRepresentation, square) => {
+    if (!square || square.color !== color[0]) return;
     setFrom(squareRepresentation);
     e.dataTransfer.setData("text/plain", squareRepresentation);
   };
@@ -14,7 +16,7 @@ const ChessBoard = ({ chess, board, socket, setBoard }) => {
     if (fromSquareRepresentation !== toSquareRepresentation) {
       socket.send(
         JSON.stringify({
-          type: MOVE,
+          type: CHESS_MOVE,
           payload: {
             move: {
               from: fromSquareRepresentation,
@@ -50,12 +52,13 @@ const ChessBoard = ({ chess, board, socket, setBoard }) => {
             return (
               <div
                 onClick={() => {
+                  if (!square || square.color !== color[0]) return;
                   if (!from) {
                     setFrom(squareRepresentation);
                   } else {
                     socket.send(
                       JSON.stringify({
-                        type: MOVE,
+                        type: CHESS_MOVE,
                         payload: {
                           move: {
                             from,
@@ -85,9 +88,9 @@ const ChessBoard = ({ chess, board, socket, setBoard }) => {
                 <div className="w-full justify-center flex h-full">
                   <div
                     className="h-full justify-center flex flex-col"
-                    draggable={!!square}
+                    draggable={square?.color === color[0]}
                     onDragStart={(e) =>
-                      handleDragStart(e, squareRepresentation)
+                      handleDragStart(e, squareRepresentation, square)
                     }
                   >
                     {square ? (

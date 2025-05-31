@@ -37,8 +37,9 @@ export class ChessGame {
       return;
     }
     try {
-      const moveRes = this.board.move(move);
-      this.moves.push(move);
+      const actualMove = move.move;
+      const moveRes = this.board.move(actualMove);
+      this.moves.push(actualMove);
     } catch (error) {
       console.log(error);
       return;
@@ -52,13 +53,13 @@ export class ChessGame {
       this.player1.send(
         JSON.stringify({
           type: GAME_OVER,
-          payload: { winner },
+          payload: { reason: `${winner} wins the game!` },
         })
       );
       this.player2.send(
         JSON.stringify({
           type: GAME_OVER,
-          payload: { winner },
+          payload: { reason: `${winner} wins the game!` },
         })
       );
       return;
