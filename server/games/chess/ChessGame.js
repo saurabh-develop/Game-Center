@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
-import { GAME_OVER, INIT_GAME, MOVE } from "./message.js";
-export class Game {
+import { GAME_OVER, INIT_GAME, CHESS_MOVE } from "../../message.js";
+export class ChessGame {
   constructor(player1, player2) {
     this.player1 = player1;
     this.player2 = player2;
@@ -68,7 +68,7 @@ export class Game {
     const opponent = isPlayer1 ? this.player2 : this.player1;
     opponent.send(
       JSON.stringify({
-        type: MOVE,
+        type: CHESS_MOVE,
         payload: move,
       })
     );

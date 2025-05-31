@@ -48,6 +48,24 @@ const fillBoard = (board) => {
   return true;
 };
 
+const generateSolution = () => {
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 9; col++) {
+      if (board[row][col] === 0) {
+        for (let num = 1; num <= 9; num++) {
+          if (isValidMove(board, row, col, num)) {
+            board[row][col] = num;
+            if (generateSolution()) return true;
+            board[row][col] = 0; // Backtrack
+          }
+        }
+        return false; // No valid number found, backtrack
+      }
+    }
+  }
+  return true; // All cells filled
+};
+
 // Remove cells based on difficulty level to create the puzzle
 const removeCells = (board, level) => {
   const newBoard = board.map((row) => [...row]);
@@ -70,4 +88,4 @@ const generateSudoku = (level) => {
   return removeCells(board, level);
 };
 
-export { generateSudoku, fillBoard };
+export { generateSudoku, fillBoard, isValidMove, generateSolution };
