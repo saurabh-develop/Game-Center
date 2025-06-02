@@ -1,4 +1,10 @@
-import { INIT_GAME, CHESS_MOVE, SUDOKU_MOVE, GAME_OVER } from "../message.js";
+import {
+  INIT_GAME,
+  CHESS_MOVE,
+  SUDOKU_MOVE,
+  GAME_OVER,
+  CHAT,
+} from "../message.js";
 import { ChessGame } from "./chess/ChessGame.js";
 import { SudokuGame } from "./sudoku/SudokuGame.js";
 
@@ -78,6 +84,26 @@ export class GameManager {
         );
         if (game && typeof game.makeMove === "function") {
           game.makeMove(socket, message.payload);
+        }
+      }
+
+      if (message.type === CHAT) {
+        const game = this.games.find(
+          (game) => game.player1 === socket || game.player2 === socket
+        );
+        if (game) {
+          const opponent =
+            game.player1 === socket ? game.player2 : game.player1;
+          if (opponent.readyState === opponent.OPEN) {
+            opponent.send(
+              JSON.stringify({
+                type: CHAT,
+                payload: {
+                  message: message.payload.message,
+                },
+              })
+            );
+          }
         }
       }
     });

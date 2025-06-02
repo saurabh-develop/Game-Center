@@ -9,3 +9,4 @@ export const SUDOKU_START = "sudoku start";
 export const SUDOKU_END = "sudoku end";
 export const SUDOKU_HINT = "sudoku hint";
 export const SUDOKU_CHECK = "sudoku check";
+export const CHAT = "chat";

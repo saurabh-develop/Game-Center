@@ -3,6 +3,7 @@ import ChessBoard from "./ChessBoard.jsx";
 import useSocket from "../../hooks/useSocket.jsx";
 import Button from "./Button.jsx";
 import { Chess } from "chess.js";
+import GameChat from "../ChatBox/GameChat.jsx";
 
 export const INIT_GAME = "init_game";
 export const CHESS_MOVE = "chess move";
@@ -17,6 +18,11 @@ const ChessGame = () => {
   const moveCount = useRef(0);
   const [color, setColor] = useState(null);
   const [moveHistory, setMoveHistory] = useState([]);
+  const moveHistoryBottomRef = useRef(null);
+
+  useEffect(() => {
+    moveHistoryBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [moveHistory]);
 
   useEffect(() => {
     if (!socket) return;
@@ -118,15 +124,20 @@ const ChessGame = () => {
               <div className="text-white">
                 <h2 className="text-xl mb-4">Game Controls</h2>
                 <p>Color: {color}</p>
-                <div className="w-full bg-gray-800 p-4 rounded-xl shadow-inner max-h-[500px] min-h-[400px] overflow-y-auto">
+                <div className="flex flex-col gap-2 mt-4">
                   <strong>Moves History:</strong>
-                  <br />
-                  {moveHistory.map((line, index) => (
-                    <span key={index}>
-                      {line}
-                      <br />
-                    </span>
-                  ))}
+                  <div className="w-full bg-gray-800 p-4 rounded-xl shadow-inner h-[200px] overflow-y-auto">
+                    {moveHistory.map((line, index) => (
+                      <span key={index}>
+                        {line}
+                        <br />
+                      </span>
+                    ))}
+                    <div ref={moveHistoryBottomRef} />
+                  </div>
+                </div>
+                <div>
+                  <GameChat socket={socket} color={color} />
                 </div>
               </div>
             )}
