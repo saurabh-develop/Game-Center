@@ -1,89 +1,109 @@
 import React, { useState } from "react";
 import { CHESS_MOVE } from "./ChessGame";
 
-const ChessBoard = ({ chess, board, socket, setBoard, color }) => {
+const ChessBoard = ({ board, socket, color, onLocalMove }) => {
   const [from, setFrom] = useState(null);
   if (!color || !board) return null;
+
   const handleDragStart = (e, squareRepresentation, square) => {
     if (!square || square.color !== color[0]) return;
     setFrom(squareRepresentation);
     e.dataTransfer.setData("text/plain", squareRepresentation);
   };
+
   const handleDrop = (e, toSquareRepresentation) => {
     e.preventDefault();
     const fromSquareRepresentation = e.dataTransfer.getData("text/plain");
 
     if (fromSquareRepresentation !== toSquareRepresentation) {
+      const move = {
+        from: fromSquareRepresentation,
+        to: toSquareRepresentation,
+      };
+
       socket.send(
         JSON.stringify({
           type: CHESS_MOVE,
-          payload: {
-            move: {
-              from: fromSquareRepresentation,
-              to: toSquareRepresentation,
-            },
-          },
+          payload: { move },
         })
       );
 
-      chess.move({
-        from: fromSquareRepresentation,
-        to: toSquareRepresentation,
-      });
-      setBoard(chess.board());
-      console.log({
-        from: fromSquareRepresentation,
-        to: toSquareRepresentation,
-      });
+      if (onLocalMove) {
+        onLocalMove(move);
+      }
     }
+
     setFrom(null);
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
+  const handleClick = (squareRepresentation, square) => {
+    if (!square || square.color !== color[0]) {
+      if (from && from !== squareRepresentation) {
+        const move = {
+          from,
+          to: squareRepresentation,
+        };
+
+        socket.send(
+          JSON.stringify({
+            type: CHESS_MOVE,
+            payload: { move },
+          })
+        );
+
+        if (onLocalMove) {
+          onLocalMove(move);
+        }
+        setFrom(null);
+      }
+      return;
+    }
+
+    if (!from) {
+      setFrom(squareRepresentation);
+    } else {
+      if (from === squareRepresentation) {
+        setFrom(null);
+      } else {
+        const move = {
+          from,
+          to: squareRepresentation,
+        };
+
+        socket.send(
+          JSON.stringify({
+            type: CHESS_MOVE,
+            payload: { move },
+          })
+        );
+
+        if (onLocalMove) {
+          onLocalMove(move);
+        }
+
+        setFrom(null);
+      }
+    }
   };
+
+  const handleDragOver = (e) => e.preventDefault();
+
   return (
     <div className="text-white">
       {board.map((row, i) => (
         <div key={i} className="flex">
           {row.map((square, j) => {
-            const squareRepresentation =
-              String.fromCharCode(97 + (j % 8)) + "" + (8 - i);
+            const squareRepresentation = String.fromCharCode(97 + j) + (8 - i);
+
             return (
               <div
-                onClick={() => {
-                  if (!square || square.color !== color[0]) return;
-                  if (!from) {
-                    setFrom(squareRepresentation);
-                  } else {
-                    socket.send(
-                      JSON.stringify({
-                        type: CHESS_MOVE,
-                        payload: {
-                          move: {
-                            from,
-                            to: squareRepresentation,
-                          },
-                        },
-                      })
-                    );
-                    setFrom(null);
-                    chess.move({
-                      from,
-                      to: squareRepresentation,
-                    });
-                    setBoard(chess.board());
-                    console.log({
-                      from,
-                      to: squareRepresentation,
-                    });
-                  }
-                }}
+                key={j}
+                onClick={() => handleClick(squareRepresentation, square)}
                 onDrop={(e) => handleDrop(e, squareRepresentation)}
                 onDragOver={handleDragOver}
-                key={j}
-                className={`w-20 h-20 flex items-center justify-center text-black
-                ${(i + j) % 2 != 0 ? "bg-green-600" : "bg-green-100"}`}
+                className={`w-20 h-20 flex items-center justify-center text-black ${
+                  (i + j) % 2 !== 0 ? "bg-green-600" : "bg-green-100"
+                }`}
               >
                 <div className="w-full justify-center flex h-full">
                   <div
@@ -93,16 +113,17 @@ const ChessBoard = ({ chess, board, socket, setBoard, color }) => {
                       handleDragStart(e, squareRepresentation, square)
                     }
                   >
-                    {square ? (
+                    {square && (
                       <img
                         className="w-20"
                         src={`/${
-                          square?.color === "b"
-                            ? square?.type
-                            : `${square?.type?.toUpperCase()} copy`
+                          square.color === "b"
+                            ? square.type
+                            : `${square.type.toUpperCase()} copy`
                         }.png`}
+                        alt={`${square.color} ${square.type}`}
                       />
-                    ) : null}
+                    )}
                   </div>
                 </div>
               </div>
