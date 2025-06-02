@@ -4,11 +4,11 @@ import useSocket from "../../hooks/useSocket.jsx";
 import Button from "./Button.jsx";
 import { Chess } from "chess.js";
 import GameChat from "../ChatBox/GameChat.jsx";
-
-export const INIT_GAME = "init_game";
-export const CHESS_MOVE = "chess move";
-export const GAME = "chess";
-export const GAME_OVER = "game over";
+import {
+  INIT_GAME,
+  CHESS_MOVE,
+  GAME_OVER,
+} from "../constants/constant.jsx";
 
 const ChessGame = () => {
   const socket = useSocket();
