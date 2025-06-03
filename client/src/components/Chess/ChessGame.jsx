@@ -4,11 +4,11 @@ import useSocket from "../../hooks/useSocket.jsx";
 import Button from "./Button.jsx";
 import { Chess } from "chess.js";
 import GameChat from "../ChatBox/GameChat.jsx";
-import {
-  INIT_GAME,
-  CHESS_MOVE,
-  GAME_OVER,
-} from "../constants/constant.jsx";
+
+export const INIT_GAME = "init_game";
+export const CHESS_MOVE = "chess move";
+export const GAME = "sudoku";
+export const GAME_OVER = "game over";
 
 const ChessGame = () => {
   const socket = useSocket();
@@ -19,6 +19,7 @@ const ChessGame = () => {
   const [color, setColor] = useState(null);
   const [moveHistory, setMoveHistory] = useState([]);
   const moveHistoryBottomRef = useRef(null);
+  const [playerId, setPlayerId] = useState(null);
 
   useEffect(() => {
     moveHistoryBottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -26,6 +27,19 @@ const ChessGame = () => {
 
   useEffect(() => {
     if (!socket) return;
+
+    const id = crypto.randomUUID();
+    setPlayerId(id);
+
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: "join", payload: { playerId: id } }));
+    } else {
+      socket.onopen = () => {
+        socket.send(
+          JSON.stringify({ type: "join", payload: { playerId: id } })
+        );
+      };
+    }
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
@@ -137,7 +151,7 @@ const ChessGame = () => {
                   </div>
                 </div>
                 <div>
-                  <GameChat socket={socket} color={color} />
+                  <GameChat socket={socket} selfId={playerId} />
                 </div>
               </div>
             )}

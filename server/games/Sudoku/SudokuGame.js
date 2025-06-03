@@ -33,7 +33,8 @@ export class SudokuGame {
 
     // Generate a board and its full solution
     const puzzle = generateSudoku(level);
-    const solution = generateSolution(puzzle);
+    const solution = deepCopy(puzzle);
+    generateSolution(solution);
     this.puzzle = puzzle;
     this.solution = solution;
 

@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import SudokuBoard from "./components/Sudoku/SudokuBoard.jsx";
 import Game from "./components/tickTackToe/Game.jsx";
 import Landing from "./components/Chess/Landing.jsx";
 import "./App.css";
 import ChessGame from "./components/Chess/ChessGame.jsx";
+import SudokuGame from "./components/Sudoku/SudokuGame.jsx";
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
         <Route path="/" element={<GameSelection />} />
         <Route path="/chess" element={<Landing />} />
         <Route path="/chessBoard" element={<ChessGame />} />
-        <Route path="/sudoku" element={<SudokuBoard />} />
+        <Route path="/sudoku" element={<SudokuGame />} />
         <Route path="/tic-tac-toe" element={<Game />} />
       </Routes>
     </BrowserRouter>

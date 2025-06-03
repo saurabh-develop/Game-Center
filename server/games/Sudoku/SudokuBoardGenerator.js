@@ -48,14 +48,18 @@ const fillBoard = (board) => {
   return true;
 };
 
-const generateSolution = () => {
+const generateSolution = (board) => {
+  if (!board || board.length !== 9 || board.some((row) => row.length !== 9)) {
+    throw new Error("Invalid board passed to generateSolution");
+  }
+
   for (let row = 0; row < 9; row++) {
     for (let col = 0; col < 9; col++) {
       if (board[row][col] === 0) {
         for (let num = 1; num <= 9; num++) {
           if (isValidMove(board, row, col, num)) {
             board[row][col] = num;
-            if (generateSolution()) return true;
+            if (generateSolution(board)) return true;
             board[row][col] = 0; // Backtrack
           }
         }
