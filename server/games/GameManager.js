@@ -56,8 +56,15 @@ export class GameManager {
       if (message.type === INIT_GAME) {
         const gameType = message.payload?.game; // 'chess' or 'sudoku'
         const level = message.payload?.level || "easy"; // for Sudoku
+        const mode = message.payload?.mode || "solo"; // for Sudoku
         if (!["chess", "sudoku"].includes(gameType)) {
           console.log("Invalid game type requested");
+          return;
+        }
+
+        if (gameType === "sudoku" && mode === "solo") {
+          const game = new SudokuGame(socket, null, level, "solo");
+          this.games.push(game);
           return;
         }
 
@@ -69,7 +76,7 @@ export class GameManager {
           if (gameType === "chess") {
             game = new ChessGame(player1, player2);
           } else if (gameType === "sudoku") {
-            game = new SudokuGame(player1, player2, level);
+            game = new SudokuGame(player1, player2, level, "multiplayer");
           }
           this.games.push(game);
           this.pendingUser[gameType] = null;
@@ -94,7 +101,7 @@ export class GameManager {
         if (game) {
           const opponent =
             game.player1 === socket ? game.player2 : game.player1;
-          if (opponent.readyState === opponent.OPEN) {
+          if (opponent && opponent.readyState === opponent.OPEN) {
             opponent.send(
               JSON.stringify({
                 type: CHAT,

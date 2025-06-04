@@ -19,6 +19,7 @@ const SudokuGame = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const scrollRef = useRef(null);
   const [playerId, setPlayerId] = useState(null);
+  const [mode, setMode] = useState(null);
 
   const handleMove = (row, col, value) => {
     socket.send(
@@ -58,6 +59,7 @@ const SudokuGame = () => {
           setStarted(true);
           setBoard(message.payload.board);
           setInitialBoard(message.payload.board);
+          setMode(message.payload.mode);
           setMoveHistory([]);
           break;
 
@@ -79,9 +81,13 @@ const SudokuGame = () => {
     }
   }, [moveHistory]);
 
-  const startGame = () => {
+  const startGame = (selectedMode) => {
+    setMode(selectedMode);
     socket.send(
-      JSON.stringify({ type: INIT_GAME, payload: { game: "sudoku" } })
+      JSON.stringify({
+        type: INIT_GAME,
+        payload: { game: "sudoku", mode: selectedMode },
+      })
     );
   };
 
@@ -113,9 +119,14 @@ const SudokuGame = () => {
 
         <div className="col-span-2 bg-gray-900 rounded-xl p-4 text-white flex flex-col justify-center items-center">
           {!started ? (
-            <Button onClick={startGame} color={"blue"}>
-              Start Sudoku
-            </Button>
+            <div className="flex flex-col items-center justify-center h-full gap-4">
+              <Button onClick={() => startGame("solo")} color={"blue"}>
+                Play Solo
+              </Button>
+              <Button onClick={() => startGame("multiplayer")} color={"blue"}>
+                1v1 Battle
+              </Button>
+            </div>
           ) : (
             <>
               <h2 className="text-xl mb-2">Game Info</h2>
