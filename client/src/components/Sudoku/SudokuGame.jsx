@@ -93,9 +93,9 @@ const SudokuGame = () => {
   };
 
   return (
-    <div className="flex justify-center items-center pt-8 max-w-screen-lg mx-auto">
+    <div className="flex justify-center items-center pt-17 max-w-screen-lg mx-auto">
       <div className="grid grid-cols-6 gap-4 w-full">
-        <div className="col-span-4 flex justify-center">
+        <div className="col-span-4 flex justify-center items-center min-h-[500px]">
           {started ? (
             <SudokuBoard
               board={board}
@@ -103,13 +103,19 @@ const SudokuGame = () => {
               onCellChange={handleMove}
             />
           ) : (
-            <div className="text-white">Waiting to start...</div>
+            <img
+              src="/sudoku3.png"
+              className="max-w-[80%] h-auto object-contain"
+              alt="Sudoku Board"
+            />
           )}
         </div>
 
-        <div className="col-span-2 bg-gray-900 rounded-xl p-4 text-white">
+        <div className="col-span-2 bg-gray-900 rounded-xl p-4 text-white flex flex-col justify-center items-center">
           {!started ? (
-            <Button onClick={startGame}>Start Sudoku</Button>
+            <Button onClick={startGame} color={"blue"}>
+              Start Sudoku
+            </Button>
           ) : (
             <>
               <h2 className="text-xl mb-2">Game Info</h2>

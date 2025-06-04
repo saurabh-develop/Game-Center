@@ -133,7 +133,9 @@ const ChessGame = () => {
 
           <div className="col-span-2 w-full flex justify-center items-center bg-gray-900 rounded-xl">
             {!started ? (
-              <Button onClick={startGame}>Start Game</Button>
+              <Button onClick={startGame} color={"green"}>
+                Start Game
+              </Button>
             ) : (
               <div className="text-white">
                 <h2 className="text-xl mb-4">Game Controls</h2>
