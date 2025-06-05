@@ -20,6 +20,7 @@ const SudokuGame = () => {
   const scrollRef = useRef(null);
   const [playerId, setPlayerId] = useState(null);
   const [mode, setMode] = useState(null);
+  const [difficulty, setDifficulty] = useState("easy");
 
   const handleMove = (row, col, value) => {
     socket.send(
@@ -61,10 +62,12 @@ const SudokuGame = () => {
           setInitialBoard(message.payload.board);
           setMode(message.payload.mode);
           setMoveHistory([]);
+          setElapsedTime(0);
           break;
 
         case GAME_OVER:
           setStarted(false);
+          setElapsedTime(0);
           alert(`Game Over: ${message.payload.reason}`);
           break;
 
@@ -81,12 +84,19 @@ const SudokuGame = () => {
     }
   }, [moveHistory]);
 
-  const startGame = (selectedMode) => {
+  const startGame = (selectedMode, selectedDifficulty) => {
+    if (!playerId) return; // prevent sending prematurely
+
     setMode(selectedMode);
     socket.send(
       JSON.stringify({
         type: INIT_GAME,
-        payload: { game: "sudoku", mode: selectedMode },
+        payload: {
+          game: "sudoku",
+          mode: selectedMode,
+          difficulty: selectedDifficulty,
+          playerId,
+        },
       })
     );
   };
@@ -119,11 +129,37 @@ const SudokuGame = () => {
 
         <div className="col-span-2 bg-gray-900 rounded-xl p-4 text-white flex flex-col justify-center items-center">
           {!started ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-              <Button onClick={() => startGame("solo")} color={"blue"}>
+            <div className="w-full max-w-[280px] flex flex-col items-center space-y-4">
+              <div className="text-white font-semibold text-base">
+                Difficulty:
+              </div>
+              <div className="flex justify-between gap-2 w-full">
+                {["easy", "medium", "hard"].map((level) => (
+                  <button
+                    key={level}
+                    onClick={() => setDifficulty(level)}
+                    className={`flex-1 py-2 rounded-lg text-sm font-medium text-white transition-all duration-200 text-center
+                    ${
+                      difficulty === level
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg"
+                        : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+                    }`}
+                  >
+                    {level.charAt(0).toUpperCase() + level.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              <Button
+                onClick={() => startGame("solo", difficulty)}
+                color={"blue"}
+              >
                 Play Solo
               </Button>
-              <Button onClick={() => startGame("multiplayer")} color={"blue"}>
+              <Button
+                onClick={() => startGame("multiplayer", difficulty)}
+                color={"blue"}
+              >
                 1v1 Battle
               </Button>
             </div>

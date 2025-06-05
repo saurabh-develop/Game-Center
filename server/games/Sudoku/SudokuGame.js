@@ -144,6 +144,11 @@ export class SudokuGame {
     }
   }
 
+  cleanup() {
+    clearTimeout(this.timer);
+    clearInterval(this.timeInterval);
+  }
+
   endGameDueToTimeout() {
     clearInterval(this.timeInterval);
 
