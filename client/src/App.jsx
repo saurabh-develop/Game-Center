@@ -1,11 +1,12 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import Game from "./components/tickTackToe/Game.jsx";
 import LandingChess from "./components/Chess/LandingChess.jsx";
 import "./App.css";
 import ChessGame from "./components/Chess/ChessGame.jsx";
 import SudokuGame from "./components/Sudoku/SudokuGame.jsx";
 import LandingSudoku from "./components/Sudoku/LandingSudoku.jsx";
+import TicTacToeGame from "./components/tickTackToe/TicTacToeGame.jsx";
+import LandingTicTacToe from "./components/tickTackToe/LandingTicTacToe.jsx";
 
 function App() {
   return (
@@ -16,7 +17,8 @@ function App() {
         <Route path="/chessBoard" element={<ChessGame />} />
         <Route path="/sudoku" element={<LandingSudoku />} />
         <Route path="/sudokuBoard" element={<SudokuGame />} />
-        <Route path="/tic-tac-toe" element={<Game />} />
+        <Route path="/tic-tac-toe" element={<LandingTicTacToe />} />
+        <Route path="/tic-tac-toe-board" element={<TicTacToeGame />} />
       </Routes>
     </BrowserRouter>
   );

@@ -4,9 +4,11 @@ import {
   SUDOKU_MOVE,
   GAME_OVER,
   CHAT,
+  TIC_TAC_TOE_MOVE,
 } from "../message.js";
 import { ChessGame } from "./chess/ChessGame.js";
 import { SudokuGame } from "./sudoku/SudokuGame.js";
+import { TicTacToeGame } from "./tictactoe/TickTackToeGame.js";
 
 export class GameManager {
   constructor() {
@@ -18,6 +20,7 @@ export class GameManager {
         medium: null,
         hard: null,
       },
+      ticTacToe: null,
     };
     this.users = [];
   }
@@ -90,9 +93,17 @@ export class GameManager {
           return !isOld;
         });
 
-        if (!["chess", "sudoku"].includes(gameType)) {
-          console.log("Invalid game type requested");
-          return;
+        if (gameType === "ticTacToe") {
+          if (
+            this.pendingUser.ticTacToe &&
+            this.pendingUser.ticTacToe !== socket
+          ) {
+            const game = new TicTacToeGame(this.pendingUser.ticTacToe, socket);
+            this.games.push(game);
+            this.pendingUser.ticTacToe = null;
+          } else {
+            this.pendingUser.ticTacToe = socket;
+          }
         }
 
         if (gameType === "sudoku" && mode === "solo") {
@@ -128,7 +139,11 @@ export class GameManager {
         }
       }
 
-      if (message.type === CHESS_MOVE || message.type === SUDOKU_MOVE) {
+      if (
+        message.type === CHESS_MOVE ||
+        message.type === SUDOKU_MOVE ||
+        message.type === TIC_TAC_TOE_MOVE
+      ) {
         const game = this.games.find(
           (game) => game.player1 === socket || game.player2 === socket
         );

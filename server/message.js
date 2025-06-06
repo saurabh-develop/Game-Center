@@ -10,3 +10,5 @@ export const SUDOKU_END = "sudoku end";
 export const SUDOKU_HINT = "sudoku hint";
 export const SUDOKU_CHECK = "sudoku check";
 export const CHAT = "chat";
+export const TIC_TAC_TOE_MOVE = "tic tac toe move";
+export const UPDATE_GAME = "update game";
