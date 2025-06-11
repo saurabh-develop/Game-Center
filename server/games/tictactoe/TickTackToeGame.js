@@ -1,4 +1,5 @@
 import { GAME_OVER, UPDATE_GAME, INIT_GAME } from "../../message.js";
+import { saveGameToDatabase } from "../../db/saveGameToDatabase.js";
 
 export class TicTacToeGame {
   constructor(player1, player2) {
@@ -10,6 +11,9 @@ export class TicTacToeGame {
       [player1, "X"],
       [player2, "O"],
     ]);
+    this.moves = [];
+    this.startTime = new Date();
+    this.endTime = null;
 
     player1.send(
       JSON.stringify({
@@ -34,10 +38,20 @@ export class TicTacToeGame {
       return;
 
     this.board[index] = symbol;
+
+    const username = socket.user?.username || "anonymous";
+    this.moves.push({
+      by: username,
+      move: index,
+      symbol,
+      timestamp: Date.now(),
+    });
+
     const winner = this.getWinner();
     const isDraw = this.board.every((cell) => cell !== null);
 
     if (winner) {
+      this.endTime = new Date();
       this.sendToBoth({
         type: UPDATE_GAME,
         payload: {
@@ -51,7 +65,9 @@ export class TicTacToeGame {
         type: GAME_OVER,
         payload: { reason: `Player ${winner} wins!` },
       });
+      this.cleanup(winner);
     } else if (isDraw) {
+      this.endTime = new Date();
       this.sendToBoth({
         type: UPDATE_GAME,
         payload: {
@@ -65,6 +81,7 @@ export class TicTacToeGame {
         type: GAME_OVER,
         payload: { reason: "Draw!" },
       });
+      this.cleanup("draw");
     } else {
       this.currentPlayer = this.currentPlayer === "X" ? "O" : "X";
       this.sendGameState();
@@ -112,5 +129,25 @@ export class TicTacToeGame {
       }
     }
     return null;
+  }
+
+  cleanup(winner) {
+    this.endTime = this.endTime || new Date();
+
+    [this.player1, this.player2].forEach((player) => {
+      if (!player || !player.isAuthenticated || !player.user?.username) return;
+
+      const username = player.user.username;
+      const userSymbol = this.symbols.get(player);
+
+      saveGameToDatabase({
+        game: "tictactoe",
+        player1Username: this.player1.username,
+        player2Username: this.player2.username,
+        winner,
+        startTime: this.startTime,
+        endTime: new Date(),
+      });
+    });
   }
 }

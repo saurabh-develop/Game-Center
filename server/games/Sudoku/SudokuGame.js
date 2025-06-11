@@ -8,6 +8,7 @@ import {
   GAME_OVER,
   TIMER_UPDATE,
 } from "../../message.js";
+import { saveGameToDatabase } from "../../db/saveGameToDatabase.js";
 
 function deepCopy(board) {
   return board.map((row) => [...row]);
@@ -31,41 +32,34 @@ export class SudokuGame {
     this.player2 = player2;
     this.level = level;
     this.mode = mode;
+    this.moves = [];
+    this.startTime = new Date();
+    this.endTime = null;
 
-    // Generate a board and its full solution
     const puzzle = generateSudoku(level);
     const solution = deepCopy(puzzle);
     generateSolution(solution);
     this.puzzle = puzzle;
     this.solution = solution;
 
-    // Each player gets their own board copy
     this.playerBoards = new Map();
     this.playerBoards.set(player1, deepCopy(puzzle));
     if (mode === "multiplayer") {
       this.playerBoards.set(player2, deepCopy(puzzle));
     }
 
-    // Start time
-    this.startTime = new Date();
-    this.timeLimit = 5 * 60 * 1000; // 5 minutes
+    this.timeLimit = 5 * 60 * 1000;
     this.timer = setTimeout(() => this.endGameDueToTimeout(), this.timeLimit);
-
-    // Timer updates to clients
     this.timeInterval = setInterval(() => {
       const elapsed = Date.now() - this.startTime.getTime();
       const message = JSON.stringify({
         type: TIMER_UPDATE,
         payload: { elapsed },
       });
-
-      this.player1.send(message);
-      if (mode === "multiplayer") {
-        this.player2.send(message);
-      }
+      player1.send(message);
+      if (mode === "multiplayer") player2.send(message);
     }, 1000);
 
-    // Send INIT_GAME
     const initPayload = JSON.stringify({
       type: INIT_GAME,
       payload: {
@@ -75,15 +69,12 @@ export class SudokuGame {
         mode: mode,
       },
     });
-    this.player1.send(initPayload);
-    if (mode === "multiplayer") {
-      this.player2.send(initPayload);
-    }
+    player1.send(initPayload);
+    if (mode === "multiplayer") player2.send(initPayload);
 
-    // Listen for moves
-    this.player1.on("message", (msg) => this.handleMessage(player1, msg));
+    player1.on("message", (msg) => this.handleMessage(player1, msg));
     if (mode === "multiplayer") {
-      this.player2.on("message", (msg) => this.handleMessage(player2, msg));
+      player2.on("message", (msg) => this.handleMessage(player2, msg));
     }
   }
 
@@ -97,25 +88,26 @@ export class SudokuGame {
   makeMove(player, move) {
     const { row, col, value } = move;
     const board = this.playerBoards.get(player);
-
-    // Do not allow editing pre-filled cells
     if (this.puzzle[row][col] !== 0) return;
 
     board[row][col] = value;
 
-    // Check if player's board is correct
+    const username = player.user?.username || "anonymous";
+    this.moves.push({
+      by: username,
+      move: { row, col, value },
+      timestamp: Date.now(),
+    });
+
     if (this.isBoardCorrect(board)) {
       this.declareWinner(player);
     }
   }
 
   isBoardCorrect(board) {
-    // Full match with solution
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
-        if (board[i][j] !== this.solution[i][j]) {
-          return false;
-        }
+        if (board[i][j] !== this.solution[i][j]) return false;
       }
     }
     return true;
@@ -124,6 +116,7 @@ export class SudokuGame {
   declareWinner(winner) {
     clearTimeout(this.timer);
     clearInterval(this.timeInterval);
+    this.endTime = new Date();
 
     const result = JSON.stringify({
       type: GAME_OVER,
@@ -139,18 +132,15 @@ export class SudokuGame {
     });
 
     this.player1.send(result);
-    if (this.mode === "multiplayer") {
-      this.player2.send(result);
-    }
-  }
+    if (this.mode === "multiplayer") this.player2.send(result);
 
-  cleanup() {
-    clearTimeout(this.timer);
-    clearInterval(this.timeInterval);
+    this.cleanup();
   }
 
   endGameDueToTimeout() {
+    clearTimeout(this.timer);
     clearInterval(this.timeInterval);
+    this.endTime = new Date();
 
     if (this.mode === "multiplayer") {
       const board1 = this.playerBoards.get(this.player1);
@@ -184,5 +174,30 @@ export class SudokuGame {
       });
       this.player1.send(result);
     }
+
+    this.cleanup();
+  }
+
+  cleanup() {
+    clearTimeout(this.timer);
+    clearInterval(this.timeInterval);
+    this.endTime = this.endTime || new Date();
+
+    [this.player1, this.player2].forEach((player) => {
+      if (!player) return;
+      if (player.isAuthenticated && player.user?.username) {
+        const board = this.playerBoards.get(player);
+        const correctCount = countCorrectEntries(board, this.solution);
+        saveGameToDatabase({
+          game: "sudoku",
+          player1Username: this.player1.username,
+          player2Username:
+            this.mode === "multiplayer" ? this.player2.username : null,
+          winner: winner,
+          startTime: this.startTime,
+          endTime: new Date(),
+        });
+      }
+    });
   }
 }

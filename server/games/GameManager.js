@@ -85,13 +85,7 @@ export class GameManager {
         const difficulty = message.payload?.difficulty || "easy"; // for Sudoku
         const mode = message.payload?.mode || "solo"; // for Sudoku
 
-        this.games = this.games.filter((game) => {
-          const isOld = game.player1 === socket || game.player2 === socket;
-          if (isOld && typeof game.cleanup === "function") {
-            game.cleanup(); // Call cleanup to clear timers
-          }
-          return !isOld;
-        });
+        this.cleanupExistingGame(socket);
 
         if (gameType === "ticTacToe") {
           if (
@@ -114,7 +108,7 @@ export class GameManager {
         }
 
         if (gameType === "chess") {
-          if (this.pendingUser.chess) {
+          if (this.pendingUser.chess && this.pendingUser.chess !== socket) {
             const game = new ChessGame(this.pendingUser.chess, socket);
             this.games.push(game);
             this.pendingUser.chess = null;
