@@ -1,18 +1,25 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import LandingChess from "./components/Chess/LandingChess.jsx";
-import "./App.css";
 import ChessGame from "./components/Chess/ChessGame.jsx";
 import SudokuGame from "./components/Sudoku/SudokuGame.jsx";
 import LandingSudoku from "./components/Sudoku/LandingSudoku.jsx";
 import TicTacToeGame from "./components/tickTackToe/TicTacToeGame.jsx";
 import LandingTicTacToe from "./components/tickTackToe/LandingTicTacToe.jsx";
+import Login from "./components/Auth/Login.jsx";
+import Registration from "./components/Auth/Registration.jsx";
+import Landing from "./components/Landing/Landing.jsx";
+
+import GameSelection from "./components/GameSelection/GameSelection.jsx";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<GameSelection />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Registration />} />
+        <Route path="/game-selection" element={<GameSelection />} />
         <Route path="/chess" element={<LandingChess />} />
         <Route path="/chessBoard" element={<ChessGame />} />
         <Route path="/sudoku" element={<LandingSudoku />} />
@@ -24,21 +31,9 @@ function App() {
   );
 }
 
-// Extracted Game Selection as a Separate Component
-const GameSelection = () => (
-  <div className="game-selection flex flex-col items-center justify-center h-screen text-gray-300">
-    <h1 className="text-2xl font-bold mb-6">Choose a Game</h1>
-    <div className="flex flex-col gap-4">
-      <Link to="/chess" className="btn">
-        Play Chess
-      </Link>
-      <Link to="/sudoku" className="btn">
-        Play Sudoku
-      </Link>
-      <Link to="/tic-tac-toe" className="btn">
-        Play Tic-Tac-Toe
-      </Link>
-    </div>
+const LandingPage = () => (
+  <div className="bg-gradient-to-br from-indigo-800 via-purple-800 to-pink-700 flex flex-col items-center justify-center h-screen text-gray-300">
+    <Landing />
   </div>
 );
 

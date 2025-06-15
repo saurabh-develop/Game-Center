@@ -109,9 +109,10 @@ const SudokuGame = () => {
   };
 
   return (
-    <div className="flex justify-center items-center pt-17 max-w-screen-lg mx-auto">
-      <div className="grid grid-cols-6 gap-4 w-full">
-        <div className="col-span-4 flex justify-center items-center min-h-[500px]">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex justify-center items-center px-4 py-10">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-6 max-w-screen-xl w-full">
+        {/* Sudoku Board Section */}
+        <div className="md:col-span-4 bg-gray-800 rounded-2xl p-6 shadow-xl flex justify-center items-center min-h-[520px]">
           {started ? (
             <SudokuBoard
               board={board}
@@ -121,54 +122,74 @@ const SudokuGame = () => {
           ) : (
             <img
               src="/sudoku3.png"
-              className="max-w-[80%] h-auto object-contain"
               alt="Sudoku Board"
+              className="max-w-full max-h-[75vh] object-contain rounded-xl shadow-lg"
             />
           )}
         </div>
 
-        <div className="col-span-2 bg-gray-900 rounded-xl p-4 text-white flex flex-col justify-center items-center">
+        {/* Side Panel */}
+        <div className="md:col-span-2 bg-gray-900 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-center items-center min-h-[520px]">
           {!started ? (
-            <div className="w-full max-w-[280px] flex flex-col items-center space-y-4">
-              <div className="text-white font-semibold text-base">
-                Difficulty:
-              </div>
-              <div className="flex justify-between gap-2 w-full">
+            <div className="w-full flex flex-col items-center space-y-8">
+              <h2 className="text-2xl font-bold text-center">
+                Choose Difficulty
+              </h2>
+
+              {/* Difficulty Buttons */}
+              <div className="flex justify-center gap-4 w-full max-w-sm">
                 {["easy", "medium", "hard"].map((level) => (
                   <button
                     key={level}
                     onClick={() => setDifficulty(level)}
-                    className={`flex-1 py-2 rounded-lg text-sm font-medium text-white transition-all duration-200 text-center
-                    ${
-                      difficulty === level
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg"
-                        : "bg-gray-800 hover:bg-gray-700 text-gray-300"
-                    }`}
+                    className={`flex-1 py-3 rounded-xl text-base font-semibold capitalize transition-all duration-200 text-white
+        ${
+          difficulty === level
+            ? "bg-gradient-to-r from-indigo-400 to-purple-500 shadow-lg"
+            : "bg-gray-800 hover:bg-gray-700 text-gray-300"
+        }`}
                   >
-                    {level.charAt(0).toUpperCase() + level.slice(1)}
+                    {level}
                   </button>
                 ))}
               </div>
 
-              <Button
-                onClick={() => startGame("solo", difficulty)}
-                color={"blue"}
-              >
-                Play Solo
-              </Button>
-              <Button
-                onClick={() => startGame("multiplayer", difficulty)}
-                color={"blue"}
-              >
-                1v1 Battle
-              </Button>
+              {/* Action Buttons */}
+              <div className="flex flex-col w-full max-w-xs gap-4">
+                <Button
+                  onClick={() => startGame("solo", difficulty)}
+                  color="blue"
+                  className="py-3 text-lg font-semibold"
+                >
+                  Play Solo
+                </Button>
+                <Button
+                  onClick={() => startGame("multiplayer", difficulty)}
+                  color="blue"
+                  className="py-3 text-lg font-semibold"
+                >
+                  1v1 Battle
+                </Button>
+              </div>
             </div>
           ) : (
-            <>
-              <h2 className="text-xl mb-2">Game Info</h2>
-              <p>Time Left: {formatTime(elapsedTime)}</p>
-              <GameChat socket={socket} selfId={playerId} />
-            </>
+            <div className="flex flex-col items-center justify-between w-full h-full">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold mb-2">Game Info</h2>
+                <p className="text-lg font-mono text-blue-400">
+                  Time Left: {formatTime(elapsedTime)}
+                </p>
+              </div>
+              <div className="w-full mt-4 flex-1 overflow-hidden">
+                {mode === "multiplayer" ? (
+                  <GameChat socket={socket} selfId={playerId} />
+                ) : (
+                  <div className="text-gray-400 text-sm text-center mt-4">
+                    Chat is disabled in Solo mode
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -6,34 +6,42 @@ const LandingChess = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-6 gap-4 p-4 pt-0 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white flex">
       {/* Sidebar Menu */}
-      <div className="md:col-span-1 flex items-center justify-center md:justify-start">
+      <div className="w-64 min-h-screen border-r border-gray-700 hidden md:block bg-[#0f172a]">
         <Menu />
       </div>
 
-      {/* Sudoku Board Image */}
-      <div className="md:col-span-3 flex justify-center items-center">
-        <img
-          src="/sudoku2.png"
-          className="max-h-screen w-auto h-auto object-contain"
-          alt="Sudoku Board"
-        />
-      </div>
+      {/* Main Content */}
+      <div className="flex flex-col md:flex-row justify-center items-center flex-1 px-6 py-12 gap-8 overflow-hidden">
+        <div className="w-full md:w-2/3 lg:w-1/2 flex justify-center">
+          <img
+            src="/sudoku2.png"
+            alt="Sudoku Board"
+            className="w-full max-w-2xl max-h-[80vh] object-contain rounded-xl shadow-2xl border-4 border-white/10"
+          />
+        </div>
 
-      {/* Right Panel */}
-      <div className="md:col-span-2 p-6 text-center md:text-left flex justify-center flex-col items-center">
-        <h1 className="font-bold text-xl md:text-2xl lg:text-3xl mt-4 md:mt-10 text-center">
-          Play Sudoku Online on the #1 Site!
-        </h1>
-        <Button
-          onClick={() => {
-            navigate("/sudokuBoard");
-          }}
-          color={"blue"}
-        >
-          Play Online
-        </Button>
+        {/* Text Panel */}
+        <div className="max-w-md w-full text-center md:text-left">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+            Play Sudoku Online
+            <span className="block text-blue-400">
+              on the #1 Multiplayer Game Site
+            </span>
+          </h1>
+          <p className="mb-6 text-gray-300 text-base">
+            Challenge your friends or match with others online in real-time
+            Sudoku battles. Simple. Clean. Fun.
+          </p>
+          <Button
+            onClick={() => navigate("/sudokuBoard")}
+            color="blue"
+            className="text-white px-6 py-3 text-lg rounded-lg shadow-lg hover:bg-blue-700 transition"
+          >
+            Play Now
+          </Button>
+        </div>
       </div>
     </div>
   );

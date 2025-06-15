@@ -31,14 +31,13 @@ const ChessGame = () => {
     const id = crypto.randomUUID();
     setPlayerId(id);
 
-    if (socket.readyState === WebSocket.OPEN) {
+    const sendJoin = () =>
       socket.send(JSON.stringify({ type: "join", payload: { playerId: id } }));
+
+    if (socket.readyState === WebSocket.OPEN) {
+      sendJoin();
     } else {
-      socket.onopen = () => {
-        socket.send(
-          JSON.stringify({ type: "join", payload: { playerId: id } })
-        );
-      };
+      socket.onopen = sendJoin;
     }
 
     socket.onmessage = (event) => {
@@ -51,7 +50,6 @@ const ChessGame = () => {
           setColor(message.payload.color);
           setMoveHistory([]);
           moveCount.current = 0;
-          console.log("You are playing as", message.payload.color);
           break;
 
         case CHESS_MOVE:
@@ -64,7 +62,6 @@ const ChessGame = () => {
               ...prev,
               `${moveCount.current}. ${move.move.from}-${move.move.to}`,
             ]);
-            console.log("Move received:", move);
           } catch (error) {
             console.error("Invalid move received:", move, error);
           }
@@ -83,12 +80,7 @@ const ChessGame = () => {
 
   const startGame = () => {
     socket.send(
-      JSON.stringify({
-        type: INIT_GAME,
-        payload: {
-          game: "chess",
-        },
-      })
+      JSON.stringify({ type: INIT_GAME, payload: { game: "chess" } })
     );
   };
 
@@ -107,57 +99,60 @@ const ChessGame = () => {
   };
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="pt-8 max-w-screen-lg w-full">
-        <div className="grid grid-cols-6 gap-4">
-          <div className="col-span-4 w-full flex justify-center">
-            {started && color ? (
-              <ChessBoard
-                board={board}
-                setBoard={setBoard}
-                socket={socket}
-                chess={chess}
-                color={color}
-                onLocalMove={handleLocalMove}
-              />
-            ) : (
-              <ChessBoard
-                setBoard={setBoard}
-                board={board}
-                socket={socket}
-                chess={chess}
-                color={"white"}
-              />
-            )}
+    <div className="h-screen w-screen flex items-center justify-center bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-4">
+      <div className="flex flex-col md:flex-row gap-8 w-full max-w-6xl items-center justify-center">
+        {/* Chess Board */}
+        <div className="bg-[#1f2937] p-4 rounded-xl shadow-xl flex items-center justify-center">
+          <div className="w-[300px] md:w-[500px] aspect-square">
+            <ChessBoard
+              board={board}
+              setBoard={setBoard}
+              socket={socket}
+              chess={chess}
+              color={started && color ? color : "white"}
+              onLocalMove={started ? handleLocalMove : undefined}
+            />
           </div>
+        </div>
 
-          <div className="col-span-2 w-full flex justify-center items-center bg-gray-900 rounded-xl">
-            {!started ? (
-              <Button onClick={startGame} color={"green"}>
-                Start Game
-              </Button>
-            ) : (
-              <div className="text-white">
-                <h2 className="text-xl mb-4">Game Controls</h2>
-                <p>Color: {color}</p>
-                <div className="flex flex-col gap-2 mt-4">
-                  <strong>Moves History:</strong>
-                  <div className="w-full bg-gray-800 p-4 rounded-xl shadow-inner h-[200px] overflow-y-auto">
-                    {moveHistory.map((line, index) => (
-                      <span key={index}>
-                        {line}
-                        <br />
-                      </span>
-                    ))}
-                    <div ref={moveHistoryBottomRef} />
-                  </div>
-                </div>
-                <div>
-                  <GameChat socket={socket} selfId={playerId} />
+        {/* Right Panel */}
+        <div className="bg-[#111827] text-white rounded-xl shadow-xl p-4 w-full md:w-[300px] flex flex-col h-[500px] justify-between">
+          {started ? (
+            <>
+              {/* Game Info */}
+              <div className="mb-2">
+                <h2 className="text-2xl font-semibold mb-2">Game Info</h2>
+                <p className="text-gray-300">
+                  You are: <span className="font-bold">{color}</span>
+                </p>
+                <p className="text-gray-300">
+                  Turn: <span className="font-bold">X</span>
+                </p>
+              </div>
+
+              {/* Move History */}
+              <div className="mb-2">
+                <h3 className="font-semibold text-lg mb-1">Move History</h3>
+                <div className="bg-[#1e293b] rounded-md h-24 overflow-y-auto p-2 text-sm shadow-inner space-y-1">
+                  {moveHistory.map((line, index) => (
+                    <div key={index}>{line}</div>
+                  ))}
+                  <div ref={moveHistoryBottomRef} />
                 </div>
               </div>
-            )}
-          </div>
+
+              {/* Game Chat */}
+              <div className="flex-grow bg-[#1e293b] rounded-md p-2 overflow-y-auto">
+                <GameChat socket={socket} selfId={playerId} />
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full">
+              <Button onClick={startGame} color="green">
+                Start Game
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

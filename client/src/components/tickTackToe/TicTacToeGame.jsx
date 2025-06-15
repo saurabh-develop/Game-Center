@@ -124,29 +124,31 @@ const TicTacToeGame = () => {
   };
 
   return (
-    <div className="flex justify-center items-center pt-16 max-w-screen-lg mx-auto">
-      <div className="grid grid-cols-6 gap-4 w-full">
-        <div className="col-span-4 flex justify-center items-center min-h-[500px]">
-          {started ? (
-            <div className="grid grid-cols-3 gap-3 bg-black p-4 rounded-2xl border border-white/10 shadow-[0_0_25px_#00f7ff30]">
-              {Array(9)
-                .fill(null)
-                .map((_, i) => renderCell(i))}
-            </div>
-          ) : (
-            <img
-              src="/tictactoe4.png"
-              className="max-w-[80%] h-auto object-contain"
-              alt="Tic Tac Toe"
-            />
-          )}
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] px-4 py-6">
+      <div className="grid md:grid-cols-6 gap-6 max-w-screen-xl w-full h-full">
+        <div className="md:col-span-4 flex justify-center items-center bg-[#1f2937] rounded-xl shadow-xl p-4">
+          <div className="w-full max-w-[90vw] md:max-w-[600px] aspect-square flex justify-center items-center">
+            {started ? (
+              <div className="grid grid-cols-3 gap-3 bg-black p-4 rounded-2xl border border-white/10 shadow-[0_0_25px_#00f7ff30]">
+                {Array(9)
+                  .fill(null)
+                  .map((_, i) => renderCell(i))}
+              </div>
+            ) : (
+              <img
+                src="/tictactoe4.png"
+                className="max-w-[80%] h-auto object-contain"
+                alt="Tic Tac Toe"
+              />
+            )}
+          </div>
         </div>
 
-        <div className="col-span-2 bg-gray-900 rounded-xl p-4 text-white flex flex-col justify-center items-center">
+        <div className="md:col-span-2 flex flex-col bg-[#111827] rounded-xl shadow-xl p-4 text-white max-h-[calc(100vh-5rem)] overflow-y-auto">
           {!started ? (
-            <div className="space-y-4 w-full max-w-[280px] flex flex-col items-center">
+            <div className="flex justify-center items-center flex-grow">
               <Button onClick={startGame} color="blue">
-                Start Multiplayer
+                Start Mutliplayer
               </Button>
             </div>
           ) : (
@@ -158,7 +160,9 @@ const TicTacToeGame = () => {
               <p className="mb-4">
                 Turn: <strong>{currentTurn}</strong>
               </p>
-              <GameChat socket={socket} selfId={playerId} />
+              <div className="flex-grow overflow-y-auto bg-[#1e293b] rounded-md p-3">
+                <GameChat socket={socket} selfId={playerId} />
+              </div>
             </>
           )}
         </div>

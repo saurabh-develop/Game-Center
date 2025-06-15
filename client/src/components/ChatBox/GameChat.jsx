@@ -13,6 +13,7 @@ const GameChat = ({ socket, selfId }) => {
 
   const sendChat = () => {
     if (!chatInput.trim()) return;
+
     const message = {
       type: CHAT,
       payload: {
@@ -20,6 +21,7 @@ const GameChat = ({ socket, selfId }) => {
         from: selfId,
       },
     };
+
     socket.send(JSON.stringify(message));
     setChatMessages((prev) => [
       ...prev,
@@ -30,6 +32,7 @@ const GameChat = ({ socket, selfId }) => {
 
   useEffect(() => {
     if (!socket) return;
+
     const handleMessage = (event) => {
       const message = JSON.parse(event.data);
       if (message.type === CHAT) {
@@ -42,14 +45,17 @@ const GameChat = ({ socket, selfId }) => {
         ]);
       }
     };
+
     socket.addEventListener("message", handleMessage);
     return () => socket.removeEventListener("message", handleMessage);
   }, [socket]);
 
   return (
-    <div className="mt-6 w-full h-full">
+    <div className="flex flex-col h-full">
       <h2 className="text-xl mb-2 text-white">Chat</h2>
-      <div className="bg-gray-800 p-3 rounded-xl h-100 overflow-y-auto mb-2 text-sm flex flex-col space-y-2">
+
+      {/* Chat messages */}
+      <div className="flex-grow bg-gray-800 p-3 rounded-xl overflow-y-auto text-sm space-y-2">
         {chatMessages.map((msg, index) => (
           <div
             key={index}
@@ -62,17 +68,17 @@ const GameChat = ({ socket, selfId }) => {
             {msg.text}
           </div>
         ))}
-
         <div ref={bottomRef} />
       </div>
 
-      <div className="flex gap-2">
+      {/* Input box */}
+      <div className="mt-2 flex gap-2">
         <input
           type="text"
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendChat()}
-          className="flex-grow p-2 rounded bg-gray-700 text-white"
+          className="flex-grow p-2 rounded bg-gray-700 text-white focus:outline-none"
           placeholder="Type a message..."
         />
         <button

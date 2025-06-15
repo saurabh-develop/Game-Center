@@ -6,33 +6,43 @@ const LandingTicTacToe = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-6 gap-4 p-4 pt-0 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white flex">
       {/* Sidebar Menu */}
-      <div className="md:col-span-1 flex items-center justify-center md:justify-start">
+      <div className="hidden md:block">
         <Menu />
       </div>
 
-      <div className="md:col-span-3 flex justify-center items-center">
-        <img
-          src="/tictactoe2.png"
-          className="max-h-screen w-auto h-auto object-contain"
-          alt="TicTacToe Board"
-        />
-      </div>
+      {/* Main Content */}
+      <div className="flex flex-col md:flex-row items-center justify-center flex-1 px-6 py-12 gap-10">
+        {/* Image Section */}
+        <div className="w-full md:w-3/5 flex justify-center">
+          <img
+            src="/tictactoe2.png"
+            alt="TicTacToe Board"
+            className="w-full max-w-xl rounded-xl shadow-2xl border-4 border-white/10"
+          />
+        </div>
 
-      {/* Right Panel */}
-      <div className="md:col-span-2 p-6 text-center md:text-left flex justify-center flex-col items-center">
-        <h1 className="font-bold text-xl md:text-2xl lg:text-3xl mt-4 md:mt-10 text-center">
-          Play TicTacToe Online on the #1 Site!
-        </h1>
-        <Button
-          onClick={() => {
-            navigate("/tic-tac-toe-board");
-          }}
-          color={"blue"}
-        >
-          Play Online
-        </Button>
+        {/* Text and Button Section */}
+        <div className="max-w-md w-full text-center md:text-left space-y-6">
+          <h1 className="text-3xl md:text-4xl font-bold leading-tight">
+            Play Tic Tac Toe Online
+            <span className="block text-blue-400 mt-1">
+              The #1 Real-Time Game Site
+            </span>
+          </h1>
+          <p className="text-gray-300 text-base">
+            Challenge friends or match with other players across the world.
+            Fast-paced, fun, and easy to play.
+          </p>
+          <Button
+            onClick={() => navigate("/tic-tac-toe-board")}
+            color="blue"
+            className="text-white px-6 py-3 text-lg rounded-lg shadow-lg hover:bg-blue-700 transition"
+          >
+            Play Now
+          </Button>
+        </div>
       </div>
     </div>
   );
