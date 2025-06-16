@@ -10,39 +10,33 @@ export class ChessGame {
     this.moves = [];
     this.startTime = new Date();
     this.endTime = null;
+    this.winner = null;
+
     this.player1.send(
       JSON.stringify({
         type: INIT_GAME,
-        payload: {
-          color: "white",
-        },
+        payload: { color: "white" },
       })
     );
     this.player2.send(
       JSON.stringify({
         type: INIT_GAME,
-        payload: {
-          color: "black",
-        },
+        payload: { color: "black" },
       })
     );
   }
+
   makeMove(socket, move) {
-    // Validation
-    // Is it this user's move
-    // Is this a valid move
-    // Chess.js is automatically validating the move. So, we don't need to validate it
-    const currentTurn = this.board.turn(); // 'w' for white, 'b' for black
+    const currentTurn = this.board.turn(); // 'w' or 'b'
     const isWhiteTurn = currentTurn === "w";
     const isPlayer1 = socket === this.player1;
     const isPlayer2 = socket === this.player2;
-    if ((isWhiteTurn && !isPlayer1) || (!isWhiteTurn && !isPlayer2)) {
-      return;
-    }
+
+    if ((isWhiteTurn && !isPlayer1) || (!isWhiteTurn && !isPlayer2)) return;
+
     try {
       const actualMove = move.move;
       const moveRes = this.board.move(actualMove);
-
       if (!moveRes) return;
 
       const username = socket.user?.username || "anonymous";
@@ -54,18 +48,17 @@ export class ChessGame {
 
       const opponent = isPlayer1 ? this.player2 : this.player1;
       if (opponent.readyState === opponent.OPEN) {
-        opponent.send(
-          JSON.stringify({
-            type: CHESS_MOVE,
-            payload: move,
-          })
-        );
+        opponent.send(JSON.stringify({ type: CHESS_MOVE, payload: move }));
       }
 
       if (this.board.isGameOver()) {
-        const winner = this.board.turn() === "w" ? "black" : "white";
-        const reason = `${winner} wins the game!`;
+        const winnerColor = this.board.turn() === "w" ? "black" : "white";
+        this.winner =
+          winnerColor === "white"
+            ? this.player1.user?.username
+            : this.player2.user?.username;
 
+        const reason = `${winnerColor} wins the game!`;
         this.player1.send(
           JSON.stringify({ type: GAME_OVER, payload: { reason } })
         );
@@ -75,9 +68,8 @@ export class ChessGame {
 
         this.cleanup();
       }
-    } catch (error) {
-      console.log(error);
-      return;
+    } catch (err) {
+      console.error("Error in makeMove:", err);
     }
   }
 
@@ -87,18 +79,29 @@ export class ChessGame {
   }
 
   storeIfAuthenticated() {
-    [this.player1, this.player2].forEach((player) => {
-      if (player.isAuthenticated && player.user?.username) {
-        saveGameToDatabase({
-          game: "chess",
-          player1Username: this.player1.username,
-          player2Username: this.player2.username,
-          winner,
-          moves: this.moves,
-          startTime: this.startTime,
-          endTime: new Date(),
-        });
-      }
-    });
+    if (this.player1.user?.username || this.player2.user?.username) {
+      saveGameToDatabase({
+        game: "chess",
+        player1Username: this.player1.user?.username,
+        player2Username: this.player2.user?.username,
+        winner: this.winner,
+        moves: this.moves,
+        startTime: this.startTime,
+        endTime: this.endTime,
+        db: global.db, // make sure this is passed or imported correctly
+      });
+    }
+  }
+
+  getResult() {
+    return {
+      game: "chess",
+      player1Username: this.player1.user?.username,
+      player2Username: this.player2.user?.username,
+      winner: this.winner,
+      moves: this.moves,
+      startTime: this.startTime,
+      endTime: this.endTime || new Date(),
+    };
   }
 }

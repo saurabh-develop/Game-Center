@@ -102,21 +102,19 @@ const ChessGame = () => {
     <div className="h-screen w-screen flex items-center justify-center bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-4">
       <div className="flex flex-col md:flex-row gap-8 w-full max-w-6xl items-center justify-center">
         {/* Chess Board */}
-        <div className="bg-[#1f2937] p-4 rounded-xl shadow-xl flex items-center justify-center">
-          <div className="w-[300px] md:w-[500px] aspect-square">
-            <ChessBoard
-              board={board}
-              setBoard={setBoard}
-              socket={socket}
-              chess={chess}
-              color={started && color ? color : "white"}
-              onLocalMove={started ? handleLocalMove : undefined}
-            />
-          </div>
+        <div className="md:col-span-4 bg-gray-800 rounded-2xl p-6 shadow-xl flex justify-center items-center min-h-[520px]">
+          <ChessBoard
+            board={board}
+            setBoard={setBoard}
+            socket={socket}
+            chess={chess}
+            color={started && color ? color : "white"}
+            onLocalMove={started ? handleLocalMove : undefined}
+          />
         </div>
 
         {/* Right Panel */}
-        <div className="bg-[#111827] text-white rounded-xl shadow-xl p-4 w-full md:w-[300px] flex flex-col h-[500px] justify-between">
+        <div className="md:col-span-2 bg-gray-900 rounded-2xl p-6 text-white shadow-xl flex flex-col justify-center items-center min-h-[520px]">
           {started ? (
             <>
               {/* Game Info */}

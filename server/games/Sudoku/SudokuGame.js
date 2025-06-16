@@ -35,6 +35,7 @@ export class SudokuGame {
     this.moves = [];
     this.startTime = new Date();
     this.endTime = null;
+    this.winner = null;
 
     const puzzle = generateSudoku(level);
     const solution = deepCopy(puzzle);
@@ -100,7 +101,14 @@ export class SudokuGame {
     });
 
     if (this.isBoardCorrect(board)) {
-      this.declareWinner(player);
+      this.winner =
+        this.mode === "multiplayer"
+          ? player === this.player1
+            ? this.player1.user?.username
+            : this.player2.user?.username
+          : this.player1.user?.username;
+
+      this.declareWinner();
     }
   }
 
@@ -113,7 +121,7 @@ export class SudokuGame {
     return true;
   }
 
-  declareWinner(winner) {
+  declareWinner() {
     clearTimeout(this.timer);
     clearInterval(this.timeInterval);
     this.endTime = new Date();
@@ -121,12 +129,7 @@ export class SudokuGame {
     const result = JSON.stringify({
       type: GAME_OVER,
       payload: {
-        winner:
-          this.mode === "multiplayer"
-            ? winner === this.player1
-              ? "player1"
-              : "player2"
-            : "solo",
+        winner: this.mode === "multiplayer" ? this.winner : "solo",
         reason: "Solved correctly",
       },
     });
@@ -148,15 +151,18 @@ export class SudokuGame {
       const score1 = countCorrectEntries(board1, this.solution);
       const score2 = countCorrectEntries(board2, this.solution);
 
-      let winner = null;
-      if (score1 > score2) winner = "player1";
-      else if (score2 > score1) winner = "player2";
-      else winner = "draw";
+      if (score1 > score2) this.winner = this.player1.user?.username;
+      else if (score2 > score1) this.winner = this.player2.user?.username;
+      else this.winner = null;
 
       const result = JSON.stringify({
         type: GAME_OVER,
         payload: {
-          winner,
+          winner: this.winner
+            ? this.winner === this.player1.user?.username
+              ? "player1"
+              : "player2"
+            : "draw",
           reason: "Time's up",
           score: { player1: score1, player2: score2 },
         },
@@ -165,14 +171,16 @@ export class SudokuGame {
       this.player1.send(result);
       this.player2.send(result);
     } else {
-      const result = JSON.stringify({
-        type: GAME_OVER,
-        payload: {
-          winner: "none",
-          reason: "Time's up",
-        },
-      });
-      this.player1.send(result);
+      this.winner = null;
+      this.player1.send(
+        JSON.stringify({
+          type: GAME_OVER,
+          payload: {
+            winner: "none",
+            reason: "Time's up",
+          },
+        })
+      );
     }
 
     this.cleanup();
@@ -183,21 +191,24 @@ export class SudokuGame {
     clearInterval(this.timeInterval);
     this.endTime = this.endTime || new Date();
 
-    [this.player1, this.player2].forEach((player) => {
-      if (!player) return;
-      if (player.isAuthenticated && player.user?.username) {
-        const board = this.playerBoards.get(player);
-        const correctCount = countCorrectEntries(board, this.solution);
-        saveGameToDatabase({
-          game: "sudoku",
-          player1Username: this.player1.username,
-          player2Username:
-            this.mode === "multiplayer" ? this.player2.username : null,
-          winner: winner,
-          startTime: this.startTime,
-          endTime: new Date(),
-        });
-      }
-    });
+    const shouldSave =
+      this.player1.user?.username || this.player2?.user?.username;
+
+    if (shouldSave) {
+      saveGameToDatabase(this.getResult());
+    }
+  }
+
+  getResult() {
+    return {
+      game: "sudoku",
+      player1Username: this.player1.user?.username,
+      player2Username:
+        this.mode === "multiplayer" ? this.player2.user?.username : null,
+      winner: this.winner,
+      moves: this.moves,
+      startTime: this.startTime,
+      endTime: this.endTime || new Date(),
+    };
   }
 }

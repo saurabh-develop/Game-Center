@@ -1,10 +1,20 @@
-import { FaChess, FaPuzzlePiece, FaTimes, FaBars } from "react-icons/fa";
+import {
+  FaChess,
+  FaPuzzlePiece,
+  FaTimes,
+  FaBars,
+  FaUser,
+} from "react-icons/fa";
 import { TbGridDots } from "react-icons/tb";
-import { useState } from "react";
+import { GiPodiumWinner } from "react-icons/gi";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext.jsx";
 
 const Menu = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const { user } = useContext(AuthContext);
+  console.log("User in Menu:", user);
 
   const navItems = [
     { name: "Chess", icon: <FaChess />, to: "/chess" },
@@ -37,7 +47,7 @@ const Menu = () => {
         </h2>
       </div>
 
-      {/* Navigation */}
+      {/* Game Navigation */}
       <nav className="space-y-4">
         {navItems.map((item) => (
           <Link
@@ -55,6 +65,46 @@ const Menu = () => {
             </span>
           </Link>
         ))}
+      </nav>
+
+      {/* Divider */}
+      <hr className="my-6 border-gray-600" />
+
+      {/* Extra Options */}
+      <nav className="space-y-4">
+        <Link
+          to="/leaderboard"
+          className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#1f2937] transition"
+        >
+          <span className="text-xl cursor-pointer">
+            <GiPodiumWinner />
+          </span>
+          <span
+            className={`text-lg font-semibold transition-opacity duration-300 ${
+              isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
+          >
+            Leaderboard
+          </span>
+        </Link>
+
+        {user && !user.guest && (
+          <Link
+            to="/profile"
+            className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#1f2937] transition"
+          >
+            <span className="text-xl cursor-pointer">
+              <FaUser />
+            </span>
+            <span
+              className={`text-lg font-semibold transition-opacity duration-300 ${
+                isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
+            >
+              Profile
+            </span>
+          </Link>
+        )}
       </nav>
     </aside>
   );

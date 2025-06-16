@@ -107,7 +107,7 @@ const SudokuGame = () => {
     const seconds = String(totalSeconds % 60).padStart(2, "0");
     return `${minutes}:${seconds}`;
   };
-
+ 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] flex justify-center items-center px-4 py-10">
       <div className="grid grid-cols-1 md:grid-cols-6 gap-6 max-w-screen-xl w-full">

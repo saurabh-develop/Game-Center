@@ -9,6 +9,7 @@ import {
 import { ChessGame } from "./chess/ChessGame.js";
 import { SudokuGame } from "./sudoku/SudokuGame.js";
 import { TicTacToeGame } from "./tictactoe/TickTackToeGame.js";
+import { saveGameToDatabase } from "../db/saveGameToDatabase.js";
 
 export class GameManager {
   constructor() {
@@ -31,17 +32,31 @@ export class GameManager {
       console.log("Received message:", data.toString());
     });
   }
-  cleanupExistingGame(socket) {
+  async cleanupExistingGame(socket) {
     const index = this.games.findIndex(
       (g) => g.player1 === socket || g.player2 === socket
     );
     if (index !== -1) {
       const game = this.games[index];
+
+      // ✅ SAVE GAME DATA if possible
+      if (game.getResult && typeof game.getResult === "function") {
+        const result = game.getResult();
+        if (result?.player1Username || result?.player2Username) {
+          try {
+            await saveGameToDatabase({ ...result, db });
+          } catch (err) {
+            console.error("Failed to save game:", err);
+          }
+        }
+      }
+
       if (game.timer) clearTimeout(game.timer);
       if (game.timeInterval) clearInterval(game.timeInterval);
       this.games.splice(index, 1);
     }
   }
+
   removeUser(socket) {
     this.users = this.users.filter((user) => user != socket); //Stopping the game
     for (const type in this.pendingUser) {

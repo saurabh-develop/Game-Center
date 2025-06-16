@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { setToken } from "../../utils/auth.js";
+import { AuthContext } from "../../context/AuthContext.jsx";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login, loginAsGuest } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,6 +19,7 @@ export default function Login() {
 
     const data = await res.json();
     if (res.ok) {
+      login(data.user, data.token);
       setToken(data.token);
       navigate("/game-selection");
     } else {
@@ -25,6 +28,7 @@ export default function Login() {
   };
 
   const handleGuestLogin = () => {
+    loginAsGuest();
     setToken("guest-token");
     navigate("/game-selection");
   };

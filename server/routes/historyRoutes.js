@@ -1,21 +1,34 @@
+// routes/gameHistory.js
 import express from "express";
 import { protect } from "../middlewares/authMiddleWare.js";
-import { MongoClient } from "mongodb";
-import dotenv from "dotenv";
-dotenv.config();
+import User from "../models/User.js";
+import { getDB } from "../utils/db.js";
 
 const router = express.Router();
-const client = new MongoClient(process.env.MONGO_URI);
-await client.connect();
-const db = client.db(process.env.DB_NAME || "game_center");
 
 router.get("/", protect, async (req, res) => {
-  const games = await db
-    .collection("game_history")
-    .find({ username: req.user.username })
-    .sort({ createdAt: -1 })
-    .toArray();
-  res.json(games);
+  try {
+    // Fetch username from authenticated user
+    const user = await User.findById(req.user.id).select("username");
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const username = user.username;
+    const db = getDB();
+
+    const games = await db
+      .collection("game_history")
+      .find({
+        $or: [{ player1: username }, { player2: username }],
+      })
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .toArray();
+
+    res.json(games);
+  } catch (err) {
+    console.error("❌ Game history fetch error:", err.message);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 export default router;

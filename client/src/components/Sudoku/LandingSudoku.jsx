@@ -8,7 +8,7 @@ const LandingChess = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white flex">
       {/* Sidebar Menu */}
-      <div className="w-64 min-h-screen border-r border-gray-700 hidden md:block bg-[#0f172a]">
+      <div className="hidden md:block">
         <Menu />
       </div>
 

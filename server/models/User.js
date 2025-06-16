@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       minlength: 3,
+      index: true,
     },
     email: {
       type: String,
@@ -16,6 +17,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
+      index: true,
     },
     password: {
       type: String,
@@ -25,9 +27,21 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    losses: {
+    gamesPlayed: {
       type: Number,
       default: 0,
+    },
+    longestWinStreak: {
+      type: Number,
+      default: 0,
+    },
+    favoriteGame: {
+      type: String,
+      default: null,
+    },
+    badges: {
+      type: [String],
+      default: [],
     },
   },
   {

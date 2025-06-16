@@ -9,8 +9,9 @@ import LandingTicTacToe from "./components/tickTackToe/LandingTicTacToe.jsx";
 import Login from "./components/Auth/Login.jsx";
 import Registration from "./components/Auth/Registration.jsx";
 import Landing from "./components/Landing/Landing.jsx";
-
 import GameSelection from "./components/GameSelection/GameSelection.jsx";
+import Profile from "./components/Profile/Profile.jsx";
+import Leaderboard from "./components/Leaderboard/Leaderboard.jsx";
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Registration />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/game-selection" element={<GameSelection />} />
         <Route path="/chess" element={<LandingChess />} />
         <Route path="/chessBoard" element={<ChessGame />} />
