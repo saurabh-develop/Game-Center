@@ -14,7 +14,6 @@ import { AuthContext } from "../context/AuthContext.jsx";
 const Menu = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { user } = useContext(AuthContext);
-  console.log("User in Menu:", user);
 
   const navItems = [
     { name: "Chess", icon: <FaChess />, to: "/chess" },

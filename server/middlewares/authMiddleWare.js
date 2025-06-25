@@ -5,6 +5,8 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export const protect = (req, res, next) => {
+  console.log("Authorization Header:", req.headers.authorization);
+
   const authHeader = req.headers.authorization;
   const token = authHeader?.startsWith("Bearer ")
     ? authHeader.split(" ")[1]

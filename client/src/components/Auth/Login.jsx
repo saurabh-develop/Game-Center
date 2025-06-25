@@ -21,6 +21,7 @@ export default function Login() {
     if (res.ok) {
       login(data.user, data.token);
       setToken(data.token);
+      localStorage.setItem("username", data.user.username);
       navigate("/game-selection");
     } else {
       alert(data.error || "Login failed");

@@ -10,6 +10,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (user) {
+      console.log("Local token:", localStorage.getItem("token"));
       fetch(`${API_BASE}/api/v1/auth/profile`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -71,7 +72,7 @@ const Profile = () => {
 
   const handleDeleteAccount = async () => {
     if (confirm("Are you sure you want to delete your account?")) {
-      await fetch(`${API_BASE}/api/v1/auth/delete`, {
+      await fetch(`${API_BASE}/api/v1/auth/delete-account`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

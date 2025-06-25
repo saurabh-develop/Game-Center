@@ -9,13 +9,25 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error("JWT_SECRET not set in environment");
 
+const generateToken = (user) =>
+  jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
+    expiresIn: "2d",
+  });
+
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
+    const user = new User({ username, email, password });
     await user.save();
-    res.status(201).json({ message: "User registered" });
+    const token = generateToken(user);
+
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+      },
+    });
   } catch (error) {
     if (error.code === 11000) {
       return res
@@ -35,15 +47,20 @@ export const login = async (req, res) => {
     }
 
     const match = await bcrypt.compare(password, user.password);
+
     if (!match) {
       throw new Error("Incorrect password");
     }
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, {
-      expiresIn: "2d",
-    });
+    const token = generateToken(user);
 
-    res.json({ token, user: { id: user._id, username: user.username } });
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+      },
+    });
   } catch (error) {
     res.status(401).json({ error: error.message });
   }
@@ -198,6 +215,7 @@ export const updatePassword = async (req, res) => {
 export const updateUsername = async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log(userId);
     const { newUsername } = req.body;
 
     if (!newUsername || newUsername.length < 3) {

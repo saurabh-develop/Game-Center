@@ -10,8 +10,6 @@ export const AuthProvider = ({ children }) => {
     const username = localStorage.getItem("username");
     const isGuest = localStorage.getItem("guest");
 
-    console.log("AuthProvider init:", { token, username, isGuest });
-
     if (isGuest === "true") {
       setUser({ username: "Guest", guest: true });
     } else if (token && username) {
@@ -19,8 +17,6 @@ export const AuthProvider = ({ children }) => {
     } else {
       setUser(null);
     }
-
-    console.log("Auth end: user =", username);
   }, []);
 
   const login = (userData, token) => {

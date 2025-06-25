@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext.jsx";
 import { setToken } from "../../utils/auth.js";
 
 export default function Registration() {
@@ -7,6 +8,7 @@ export default function Registration() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +20,9 @@ export default function Registration() {
 
     const data = await res.json();
     if (res.ok) {
+      login(data.user, data.token);
       setToken(data.token);
+      localStorage.setItem("username", data.user.username);
       navigate("/game-selection");
     } else {
       alert(data.error || "Registration failed");
