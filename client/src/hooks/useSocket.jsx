@@ -1,21 +1,28 @@
-import React, { useEffect, useState } from "react";
-
-const WS_URL = "ws://localhost:8080";
-
+import { useState, useEffect } from "react";
 const useSocket = () => {
   const [socket, setSocket] = useState(null);
+
   useEffect(() => {
-    const ws = new WebSocket(WS_URL);
+    const token = localStorage.getItem("token");
+    const url = token
+      ? `ws://localhost:8080?token=${token}`
+      : "ws://localhost:8080";
+
+    const ws = new WebSocket(url);
+
     ws.onopen = () => {
       setSocket(ws);
     };
+
     ws.onclose = () => {
       setSocket(null);
     };
+
     return () => {
       ws.close();
     };
   }, []);
+
   return socket;
 };
 

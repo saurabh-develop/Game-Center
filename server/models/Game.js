@@ -7,11 +7,9 @@ const gameSchema = new mongoose.Schema({
   },
   player2: {
     type: String,
-    required: true,
   },
   winner: {
     type: String, // username or "draw"
-    required: true,
   },
   gameType: {
     type: String, // "chess", "sudoku", "tictactoe"

@@ -7,7 +7,7 @@ const Leaderboard = () => {
   const [leaders, setLeaders] = useState([]);
 
   useEffect(() => {
-    fetch("/api/v1/leaderboard")
+    fetch("http://localhost:8080/api/v1/leaderboard")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch leaderboard");
         return res.json();

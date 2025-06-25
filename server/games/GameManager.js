@@ -41,9 +41,16 @@ export class GameManager {
 
       // ✅ SAVE GAME DATA if possible
       if (game.getResult && typeof game.getResult === "function") {
-        const result = game.getResult();
+        const result = game.getResult?.();
+        if (!result.player1Username && game.player1?.user?.username) {
+          result.player1Username = game.player1.user.username;
+        }
+        if (!result.player2Username && game.player2?.user?.username) {
+          result.player2Username = game.player2.user.username;
+        }
         if (result?.player1Username || result?.player2Username) {
           try {
+            console.log("Saving game for:", this.getResult());
             await saveGameToDatabase({ ...result, db });
           } catch (err) {
             console.error("Failed to save game:", err);
