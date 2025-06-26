@@ -49,22 +49,24 @@ const Leaderboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {leaders.map((player, idx) => (
-                    <tr
-                      key={player.username}
-                      className={`transition duration-200 ${
-                        idx % 2 === 0 ? "bg-gray-900" : "bg-gray-950"
-                      } hover:bg-gray-800`}
-                    >
-                      <td className="py-3 px-4 font-semibold">
-                        {medalIcons[idx] || idx + 1}
-                      </td>
-                      <td className="py-3 px-4">{player.username}</td>
-                      <td className="py-3 px-4 text-yellow-300 font-bold">
-                        {player.wins}
-                      </td>
-                    </tr>
-                  ))}
+                  {leaders
+                    .filter((player) => player.wins > 0)
+                    .map((player, idx) => (
+                      <tr
+                        key={player.username}
+                        className={`transition duration-200 ${
+                          idx % 2 === 0 ? "bg-gray-900" : "bg-gray-950"
+                        } hover:bg-gray-800`}
+                      >
+                        <td className="py-3 px-4 font-semibold">
+                          {medalIcons[idx] || idx + 1}
+                        </td>
+                        <td className="py-3 px-4">{player.username}</td>
+                        <td className="py-3 px-4 text-yellow-300 font-bold">
+                          {player.wins}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>

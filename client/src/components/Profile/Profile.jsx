@@ -137,7 +137,7 @@ const Profile = () => {
                 <span className="font-medium">{stats.longestWinStreak}</span>
               </p>
               <p>
-                <span className="text-gray-400">🎮 Favorite Game:</span>{" "}
+                <span className="text-gray-400">🎮 Most Played Game:</span>{" "}
                 <span className="font-medium">{stats.favoriteGame}</span>
               </p>
             </div>

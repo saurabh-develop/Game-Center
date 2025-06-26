@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 const useSocket = () => {
   const [socket, setSocket] = useState(null);
 
@@ -10,17 +11,14 @@ const useSocket = () => {
 
     const ws = new WebSocket(url);
 
-    ws.onopen = () => {
-      setSocket(ws);
-    };
-
-    ws.onclose = () => {
+    ws.onopen = () => setSocket(ws);
+    ws.onclose = () => setSocket(null);
+    ws.onerror = (err) => {
+      console.error("WebSocket error:", err);
       setSocket(null);
     };
 
-    return () => {
-      ws.close();
-    };
+    return () => ws.close();
   }, []);
 
   return socket;
