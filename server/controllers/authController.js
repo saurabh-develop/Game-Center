@@ -12,9 +12,8 @@ if (!JWT_SECRET) throw new Error("JWT_SECRET not set in environment");
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
-    await user.save();
+    const user = new User({ username, email, password });
+    await user.save(); // ⬅️ Schema hook handles hashing
     res.status(201).json({ message: "User registered" });
   } catch (error) {
     if (error.code === 11000) {
