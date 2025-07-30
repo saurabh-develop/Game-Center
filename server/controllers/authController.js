@@ -13,7 +13,7 @@ export const register = async (req, res) => {
   const { username, email, password } = req.body;
   try {
     const user = new User({ username, email, password });
-    await user.save(); // ⬅️ Schema hook handles hashing
+    await user.save();
     res.status(201).json({ message: "User registered" });
   } catch (error) {
     if (error.code === 11000) {
@@ -177,10 +177,10 @@ export const updatePassword = async (req, res) => {
     const userId = req.user.id;
     const { newPassword } = req.body;
 
-    if (!newPassword || newPassword.length < 6) {
+    if (!newPassword) {
       return res
         .status(400)
-        .json({ error: "Password must be at least 6 characters." });
+        .json({ error: "Password must be at least 1 characters." });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);

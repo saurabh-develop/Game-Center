@@ -16,30 +16,24 @@ import { GameManager } from "./games/GameManager.js";
 
 dotenv.config();
 
-// --- Initialize Express ---
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// --- Security & Rate Limiting ---
 app.use(helmet());
 app.use(rateLimit({ windowMs: 1 * 60 * 1000, max: 100 }));
 
-// --- MongoDB Connection ---
 mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err.message));
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err.message));
 
-// --- API Routes ---
-app.use("/api/v1/auth", authRoutes); // Login, Register, Profile
-app.use("/api/v1/leaderboard", leaderboardRoutes); // Top players
-app.use("/api/v1/history", historyRoutes); // Match history for profile
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/leaderboard", leaderboardRoutes);
+app.use("/api/v1/history", historyRoutes);
 
-// --- HTTP + WebSocket Server ---
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 const gameManager = new GameManager();
@@ -52,13 +46,13 @@ wss.on("connection", (ws, req) => {
   if (token) {
     try {
       user = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("✅ Authenticated user connected:", user.username);
+      console.log("Authenticated user connected:", user.username);
     } catch (err) {
-      console.error("❌ Invalid token:", err.message);
+      console.error("Invalid token:", err.message);
       return ws.close(1008, "Invalid token");
     }
   } else {
-    console.log("🔓 Anonymous user connected");
+    console.log("Anonymous user connected");
   }
 
   ws.user = user;
@@ -67,15 +61,14 @@ wss.on("connection", (ws, req) => {
   gameManager.addUser(ws);
 
   ws.on("close", () => {
-    console.log(`🔌 User ${user?.username || "anonymous"} disconnected`);
+    console.log(`User ${user?.username || "anonymous"} disconnected`);
     gameManager.removeUser(ws);
   });
 
   ws.on("error", console.error);
 });
 
-// --- Start Server ---
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

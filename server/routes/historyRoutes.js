@@ -1,4 +1,3 @@
-// routes/gameHistory.js
 import express from "express";
 import { protect } from "../middlewares/authMiddleWare.js";
 import User from "../models/User.js";
@@ -8,7 +7,6 @@ const router = express.Router();
 
 router.get("/", protect, async (req, res) => {
   try {
-    // Fetch username from authenticated user
     const user = await User.findById(req.user.id).select("username");
     if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -26,7 +24,7 @@ router.get("/", protect, async (req, res) => {
 
     res.json(games);
   } catch (err) {
-    console.error("❌ Game history fetch error:", err.message);
+    console.error("Game history fetch error:", err.message);
     res.status(500).json({ error: "Server error" });
   }
 });

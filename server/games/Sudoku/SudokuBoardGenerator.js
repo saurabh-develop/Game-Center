@@ -1,4 +1,3 @@
-// Create an empty 9x9 board
 const createEmptyBoard = () => {
   return Array.from({ length: 9 }, () => Array(9).fill(0));
 };

@@ -88,7 +88,7 @@ export class ChessGame {
         moves: this.moves,
         startTime: this.startTime,
         endTime: this.endTime,
-        db: global.db, // make sure this is passed or imported correctly
+        db: global.db,
       });
     }
   }

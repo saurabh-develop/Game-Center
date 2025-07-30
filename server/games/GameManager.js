@@ -58,7 +58,7 @@ export class GameManager {
   }
 
   removeUser(socket) {
-    this.users = this.users.filter((user) => user != socket); //Stopping the game
+    this.users = this.users.filter((user) => user != socket);
     for (const type in this.pendingUser) {
       if (type === "sudoku") {
         for (const level in this.pendingUser.sudoku) {
@@ -96,7 +96,7 @@ export class GameManager {
       const message = JSON.parse(data.toString());
 
       if (message.type === INIT_GAME) {
-        const gameType = message.payload?.game; // 'chess' or 'sudoku'
+        const gameType = message.payload?.game;
         const difficulty = message.payload?.difficulty || "easy"; // for Sudoku
         const mode = message.payload?.mode || "solo"; // for Sudoku
 

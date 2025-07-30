@@ -3,7 +3,6 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
-// Get top 10 users by wins
 router.get("/", async (req, res) => {
   try {
     const topUsers = await User.find({}, "username wins gamesPlayed")
